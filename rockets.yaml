@@ -1,0 +1,175 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Rocket API
+  description: This is an API for managing rockets.
+  license:
+    name: Attribution ShareAlike (CC BY-SA)
+    url: https://creativecommons.org/licenses/by-sa/4.0/legalcode
+servers:
+  - url: http://rocket.api.example.com/v1
+paths:
+  /rockets:
+    get:
+      summary: List Rockets
+      description: List of all rockets.
+      operationId: listRockets
+      tags:
+        - Rockets
+      parameters:
+        - name: limit
+          in: query
+          description: How many items to return at one time (max 100)
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: A paged array of rockets
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rockets"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Create a Rocket
+      operationId: createRockets
+      requestBody:
+        description: Rocket body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rocket'
+      tags:
+        - Rockets
+      responses:
+        '201':
+          description: Null response
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /rockets/{rocket_id}:
+    get:
+      summary: Get Rocket
+      description: Gets a single rocket.
+      operationId: getRocket
+      tags:
+        - Rockets
+      parameters:
+        - name: rocket_id
+          in: path
+          required: true
+          description: The id of the rocket to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rocket"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: Update Rocket
+      description: Updates a rocket.
+      operationId: updateRocket
+      parameters:
+        - name: rocket_id
+          in: path
+          required: true
+          description: The id of the rocket to retrieve
+          schema:
+            type: string
+      requestBody:
+        description: Rocket body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rocket'
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rocket"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      tags:
+        - Rockets
+    delete:
+      summary: Delete Rocket
+      description: Delete a rocket.
+      operationId: deleteRocket
+      tags:
+        - Rockets
+      parameters:
+        - name: rocket_id
+          in: path
+          required: true
+          description: The id of the rocket to retrieve
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Delete Accepted
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Rocket:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+    Rockets:
+      type: array
+      items:
+        $ref: "#/components/schemas/Rocket"
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
